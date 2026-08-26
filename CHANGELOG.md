@@ -1,5 +1,14 @@
 # Changelog
 
+## v1.2.1 — 2026-08-26
+
+Contact address only. No change to the dataset, the tool names, the arguments,
+or the response envelopes.
+
+`package.json` now carries an `author` email — `npm@adamkinney.com`, a dedicated
+address for open-source traffic. It previously listed a name and a URL but no
+address, so npm showed no way to reach the maintainer.
+
 ## v1.2.0 — 2026-08-26
 
 Renamed and re-homed. No change to the dataset, the tool names, the arguments,
