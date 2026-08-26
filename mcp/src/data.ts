@@ -18,7 +18,6 @@ export interface Monster {
   initiative_modifier: number;
   source: string;
   attribution: string;
-  user_id: string | null;
   stat_block_json: Record<string, unknown>;
 }
 

@@ -1,5 +1,33 @@
 # Changelog
 
+## v1.2.0 — 2026-08-26
+
+Renamed and re-homed. No change to the dataset, the tool names, the arguments,
+or the response envelopes.
+
+**Package renamed to `@adkinn/fifth-edition-srd-mcp`.** The old
+`@cocoajamworld/fifth-edition-srd-mcp` is deprecated on npm and gets no further
+releases; installs of 1.1.0 keep working. The repo moved to
+`github.com/adkinn/srd-5.2.1` (the old path redirects).
+
+**Fixes:**
+- The `license` tool and the LICENSE file pointed attribution at
+  `cocoajam.world`, which no longer resolves. Attribution now names Adam Kinney
+  and links somewhere that answers. WotC and Open5e credits are unchanged — they
+  were always the load-bearing part of the CC BY 4.0 attribution.
+- The server reported `version: "1.0.0"` in the MCP `initialize` handshake all
+  through the 1.1.0 release. It now reads the version from `package.json`, so it
+  can't drift again.
+- The exported `Monster` type still declared `user_id`, which v1.1.0 removed
+  from the data. Dropped from the interface.
+- JSON Schema `$id` URLs updated to the new repo path.
+
+**Maintenance:**
+- `@modelcontextprotocol/sdk` 1.9 → 1.30, TypeScript 5.8 → 7.0, `@types/node`
+  22 → 24. `npm audit` clean (the SDK's transitive `hono`/`fast-uri`/
+  `body-parser` advisories are resolved).
+- Minimum Node raised to 20 (18 is end-of-life). CI now runs 20/22/24.
+
 ## v1.1.0 — 2026-05-15
 
 Dataset cleanup pass: smaller payload, less internal-schema leakage.

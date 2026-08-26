@@ -1,13 +1,16 @@
 {
-  "name": "@cocoajamworld/fifth-edition-srd-mcp",
-  "version": "1.1.0",
+  "name": "@adkinn/fifth-edition-srd-mcp",
+  "version": "1.2.0",
   "description": "stdio MCP server for SRD 5.2.1 monsters and conditions (2024 rules)",
   "type": "module",
   "bin": {
     "fifth-edition-srd-mcp": "dist/index.js"
   },
   "main": "dist/index.js",
-  "files": ["dist", "data"],
+  "files": [
+    "dist",
+    "data"
+  ],
   "scripts": {
     "build": "tsc",
     "prepare": "node -e \"require('fs').cpSync('../data', './data', {recursive: true, force: true})\" && npm run build",
@@ -16,20 +19,31 @@
     "test:build": "npm run build && npm test"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.9.0"
+    "@modelcontextprotocol/sdk": "^1.30.0"
   },
   "devDependencies": {
-    "@types/node": "^22.0.0",
-    "typescript": "^5.8.0"
+    "@types/node": "^24.13.3",
+    "typescript": "^7.0.2"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=20"
   },
-  "keywords": ["mcp", "srd", "ttrpg", "fifth-edition", "5e", "2024"],
+  "keywords": [
+    "mcp",
+    "srd",
+    "ttrpg",
+    "fifth-edition",
+    "5e",
+    "2024"
+  ],
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/cocoajamworld/srd-5.2.1"
+    "url": "git+https://github.com/adkinn/srd-5.2.1.git"
   },
-  "homepage": "https://github.com/cocoajamworld/srd-5.2.1#readme"
+  "homepage": "https://github.com/adkinn/srd-5.2.1#readme",
+  "bugs": {
+    "url": "https://github.com/adkinn/srd-5.2.1/issues"
+  },
+  "author": "Adam Kinney (https://adamkinney.com)"
 }

@@ -5,14 +5,26 @@ import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import { join, dirname } from "node:path";
 
 import { lookupMonsterTool, handleLookupMonster } from "./tools/lookup_monster.js";
 import { lookupConditionTool, handleLookupCondition } from "./tools/lookup_condition.js";
 import { searchMonstersTool, handleSearchMonsters } from "./tools/search_monsters.js";
 import { licenseTool, handleLicense } from "./tools/license.js";
 
+// Read the version off package.json rather than restating it here — the
+// hardcoded "1.0.0" was still being reported in the 1.1.0 release.
+const { version } = JSON.parse(
+  readFileSync(
+    join(dirname(fileURLToPath(import.meta.url)), "../package.json"),
+    "utf-8"
+  )
+) as { version: string };
+
 const server = new Server(
-  { name: "srd-5.2.1", version: "1.0.0" },
+  { name: "srd-5.2.1", version },
   { capabilities: { tools: {} } }
 );
 

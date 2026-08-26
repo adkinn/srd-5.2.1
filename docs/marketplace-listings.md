@@ -1,6 +1,11 @@
 # MCP Marketplace Listings
 
-Submission log for the `@cocoajamworld/srd-5.2.1-mcp` package across MCP marketplaces.
+Submission log for `@adkinn/fifth-edition-srd-mcp` across MCP marketplaces.
+
+**Nothing here has been submitted.** This file is a plan, not a record — every
+row below is empty because no listing was ever filed. It also carried the wrong
+package name (`@cocoajamworld/srd-5.2.1-mcp`, which never existed) until
+2026-08-26.
 
 ## Status
 

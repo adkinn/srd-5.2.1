@@ -20,8 +20,8 @@ This dataset was built from the Open5e API (https://api.open5e.com/, document sl
 which re-publishes the SRD under the same CC BY 4.0 license. Both sources are credited per
 CC BY 4.0 TASL requirements.
 
-Dataset maintained by Cocoajam (https://cocoajam.world).
-GitHub: https://github.com/cocoajamworld/srd-5.2.1
+Dataset maintained by Adam Kinney (https://adamkinney.com).
+GitHub: https://github.com/adkinn/srd-5.2.1
 `.trim();
 
 export function handleLicense() {
