@@ -59,3 +59,17 @@ version, validates `data/` against the schemas, packs the tarball and asserts
 the real contents (every `dist/` entry point plus the full 322-monster /
 14-condition dataset), and skips the publish if that version is already on npm
 — so re-tagging or re-running the job is safe.
+
+### npm credentials — there aren't any
+
+The workflow authenticates with **OIDC trusted publishing**: GitHub mints a
+short-lived, workflow-scoped credential at publish time. There is no npm token
+in this repo, no repository secret, and nothing to rotate. Provenance is
+generated automatically as a result — which is why the publish command carries
+no `--provenance` flag.
+
+The one-time setup lives on npm, at
+<https://www.npmjs.com/package/@adkinn/fifth-edition-srd-mcp/access> →
+**Trusted publisher**: organization `adkinn`, repository `srd-5.2.1`, workflow
+filename `release.yml` (filename only, extension included, case-sensitive),
+environment empty, allowed action `npm publish`.
