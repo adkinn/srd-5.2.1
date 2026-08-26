@@ -42,8 +42,20 @@ changes require a minor version bump.
 
 ## Releasing (maintainer)
 
+Publishing is automated. Pushing a `vX.Y.Z` tag runs
+`.github/workflows/release.yml`, which re-runs the whole gate and publishes to
+npm with a signed provenance statement. Do not `npm publish` by hand — the
+manual path produces an unsigned tarball and skips the checks.
+
 1. Regenerate `data/` with the parser and review the diff.
 2. Bump the version in `CHANGELOG.md` and `mcp/package.json`. The MCP server
    reads its reported version from `package.json`, so there is no third place.
 3. `cd mcp && npm run prepare && npm test`
-4. Commit, tag `vX.Y.Z`, push with `--tags`, then `npm publish` from `mcp/`.
+4. Commit and push `main`, then tag `vX.Y.Z` and push the tag.
+
+The tag is the trigger, so push it only when `main` is where you want it. The
+workflow refuses to run if the tag and `mcp/package.json` disagree on the
+version, validates `data/` against the schemas, packs the tarball and asserts
+the real contents (every `dist/` entry point plus the full 322-monster /
+14-condition dataset), and skips the publish if that version is already on npm
+— so re-tagging or re-running the job is safe.

@@ -1,0 +1,99 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: mcp
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          # active LTS at publish time — bump when Node's LTS line advances
+          node-version: 22
+          registry-url: 'https://registry.npmjs.org'
+          cache: 'npm'
+          cache-dependency-path: mcp/package-lock.json
+
+      - run: npm ci
+
+      - name: Verify tag matches package.json version
+        run: |
+          PKG_VERSION=$(node -p "require('./package.json').version")
+          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          if [ "$PKG_VERSION" != "$TAG_VERSION" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match package.json version $PKG_VERSION"
+            exit 1
+          fi
+
+      # Full gate before publish — a tag on a broken commit can't ship to npm.
+      # `build` is `tsc`, so it doubles as the typecheck.
+      - run: npm run build
+
+      - run: npm test
+
+      # The data files ARE the package. They ship in the tarball, so they get
+      # the same validation the CI workflow runs, not just the code.
+      - name: Validate data files against schemas
+        working-directory: .
+        run: |
+          npx ajv-cli@5 validate -s data/schema/monster.schema.json -d data/monsters.json
+          npx ajv-cli@5 validate -s data/schema/condition.schema.json -d data/conditions.json
+
+      # `prepack` copies ../data into mcp/data and rebuilds, so what npm packs
+      # is not what sits in the tree right now. Pack first, then assert against
+      # the real tarball — this catches an empty or missing dataset, which is
+      # the failure that would actually matter to an installer.
+      - name: Verify the tarball has code and data in it
+        run: |
+          TARBALL=$(npm pack --silent)
+          echo "packed: $TARBALL"
+          for f in package/dist/index.js \
+                   package/dist/data.js \
+                   package/dist/tools/lookup_monster.js \
+                   package/dist/tools/lookup_condition.js \
+                   package/dist/tools/search_monsters.js \
+                   package/dist/tools/license.js \
+                   package/data/monsters.json \
+                   package/data/conditions.json; do
+            SIZE=$(tar -xOf "$TARBALL" "$f" 2>/dev/null | wc -c)
+            if [ "$SIZE" -eq 0 ]; then
+              echo "::error::expected tarball entry missing or empty: $f"
+              exit 1
+            fi
+            echo "ok ($SIZE bytes): $f"
+          done
+          # Both data files are {_license, <collection>} envelopes, not bare arrays.
+          MONSTERS=$(tar -xOf "$TARBALL" package/data/monsters.json | node -p "JSON.parse(require('fs').readFileSync(0,'utf8')).monsters.length")
+          CONDITIONS=$(tar -xOf "$TARBALL" package/data/conditions.json | node -p "JSON.parse(require('fs').readFileSync(0,'utf8')).conditions.length")
+          echo "tarball contents: $MONSTERS monsters, $CONDITIONS conditions"
+          if [ "$MONSTERS" -lt 300 ] || [ "$CONDITIONS" -lt 14 ]; then
+            echo "::error::dataset is short — expected the full SRD set (322 monsters, 14 conditions)"
+            exit 1
+          fi
+          rm -f "$TARBALL"
+
+      # Idempotent: skip if this version is already on npm, so re-tagging an
+      # already-published version (or re-running the job) never false-fails.
+      - name: Publish to npm (skip if version already published)
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          if npm view "@adkinn/fifth-edition-srd-mcp@${VERSION}" version >/dev/null 2>&1; then
+            echo "@adkinn/fifth-edition-srd-mcp@${VERSION} is already published — skipping publish."
+          else
+            npm publish --provenance --access public
+          fi
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
