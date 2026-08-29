@@ -48,7 +48,6 @@
         "initiative_modifier": { "type": "integer" },
         "source": { "type": "string" },
         "attribution": { "type": "string" },
-        "user_id": { "type": ["string", "null"] },
         "stat_block_json": { "$ref": "#/$defs/StatBlock" }
       }
     },

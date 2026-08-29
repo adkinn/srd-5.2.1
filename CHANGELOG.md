@@ -1,5 +1,24 @@
 # Changelog
 
+## Unreleased
+
+- Validate tool arguments with Zod. Each tool's schema is the single source for
+  both the `inputSchema` advertised over `tools/list` (via `z.toJSONSchema`) and
+  the check the `tools/call` handler runs before dispatch. Calls with malformed
+  arguments now come back as tool errors naming the offending field, instead of
+  surfacing an internal exception as a JSON-RPC failure, and `search_monsters`
+  accepts an omitted arguments object. Arguments a tool does not declare are
+  still ignored rather than rejected — no previously-working call changes
+  behavior.
+- Report the real package version over `initialize`. The server hardcoded
+  `1.0.0` and was still reporting it as of the 1.1.0 release; it now reads the
+  version from `package.json`.
+- Remove the obsolete `user_id` property from the monster JSON Schema.
+- Repair package-lock identity/version/engine metadata after the npm scope move.
+- Ship package-root README and combined license guidance, align Node types with
+  the Node 20 runtime floor, and stop compiling tests into the npm tarball.
+- Remove the duplicate pack-time build and cleanly mirror data before packing.
+
 ## v1.2.1 — 2026-08-26
 
 Contact address only. No change to the dataset, the tool names, the arguments,

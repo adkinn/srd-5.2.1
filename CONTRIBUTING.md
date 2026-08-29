@@ -27,8 +27,7 @@ normal pull requests.
 ```bash
 cd mcp
 npm ci
-npm run build
-npm test              # unit tests against dist/
+npm test              # builds, then runs unit + in-memory MCP protocol tests
 bash scripts/smoke.sh # end-to-end over stdio
 ```
 
