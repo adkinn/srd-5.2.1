@@ -44,9 +44,7 @@ jobs:
           fi
 
       # Full gate before publish — a tag on a broken commit can't ship to npm.
-      # `build` is `tsc`, so it doubles as the typecheck.
-      - run: npm run build
-
+      # `test` performs clean production/test builds before running the suite.
       - run: npm test
 
       # The data files ARE the package. They ship in the tarball, so they get
@@ -66,11 +64,14 @@ jobs:
           TARBALL=$(npm pack --silent)
           echo "packed: $TARBALL"
           for f in package/dist/index.js \
+                   package/dist/server.js \
                    package/dist/data.js \
                    package/dist/tools/lookup_monster.js \
                    package/dist/tools/lookup_condition.js \
                    package/dist/tools/search_monsters.js \
                    package/dist/tools/license.js \
+                   package/LICENSE \
+                   package/README.md \
                    package/data/monsters.json \
                    package/data/conditions.json; do
             SIZE=$(tar -xOf "$TARBALL" "$f" 2>/dev/null | wc -c)

@@ -28,10 +28,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build
-        run: npm run build
-
-      - name: Run unit tests
+      - name: Build and run unit/protocol tests
         run: npm test
 
   validate-schema:

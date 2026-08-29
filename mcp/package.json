@@ -12,17 +12,18 @@
     "data"
   ],
   "scripts": {
-    "build": "tsc",
-    "prepare": "node -e \"require('fs').cpSync('../data', './data', {recursive: true, force: true})\" && npm run build",
-    "prepack": "npm run prepare",
-    "test": "node --experimental-test-snapshots --test dist/test/*.test.js",
-    "test:build": "npm run build && npm test"
+    "build": "node -e \"require('fs').rmSync('dist', { recursive: true, force: true })\" && tsc",
+    "build:test": "node -e \"require('fs').rmSync('dist-test', { recursive: true, force: true })\" && tsc -p tsconfig.test.json",
+    "lint": "node scripts/lint-package.mjs",
+    "prepare": "node scripts/prepare-package.mjs && npm run build",
+    "test": "npm run lint && npm run build && npm run build:test && node --test dist-test/test/*.test.js"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.30.0"
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@types/node": "^24.13.3",
+    "@types/node": "^20.19.43",
     "typescript": "^7.0.2"
   },
   "engines": {
@@ -36,7 +37,7 @@
     "5e",
     "2024"
   ],
-  "license": "MIT",
+  "license": "SEE LICENSE IN LICENSE",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/adkinn/srd-5.2.1.git"
