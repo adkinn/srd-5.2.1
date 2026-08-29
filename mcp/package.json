@@ -1,6 +1,6 @@
 {
   "name": "@adkinn/fifth-edition-srd-mcp",
-  "version": "1.2.1",
+  "version": "1.3.0",
   "description": "stdio MCP server for SRD 5.2.1 monsters and conditions (2024 rules)",
   "type": "module",
   "bin": {

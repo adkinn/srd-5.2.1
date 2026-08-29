@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## v1.3.0 — 2026-08-29
 
 - Validate tool arguments with Zod. Each tool's schema is the single source for
   both the `inputSchema` advertised over `tools/list` (via `z.toJSONSchema`) and
