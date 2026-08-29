@@ -1,13 +1,11 @@
 import { LICENSE } from "../data.js";
+import { z } from "zod";
 
 export const licenseTool = {
   name: "license",
   description:
     "Returns the full CC BY 4.0 attribution block for this dataset, including WotC and Open5e credits.",
-  inputSchema: {
-    type: "object" as const,
-    properties: {},
-  },
+  inputSchema: z.object({}),
 };
 
 const FULL_ATTRIBUTION = `

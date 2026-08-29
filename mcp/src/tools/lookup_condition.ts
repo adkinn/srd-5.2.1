@@ -1,19 +1,15 @@
 import { findCondition, LICENSE } from "../data.js";
+import { z } from "zod";
+
+const lookupConditionInputSchema = z.object({
+  name: z.string().min(1).describe("Condition name, e.g. 'charmed' or 'Blinded'"),
+});
 
 export const lookupConditionTool = {
   name: "lookup_condition",
   description:
     "Look up a condition by name from the SRD 5.2.1 dataset. Returns the condition rules or null if not found.",
-  inputSchema: {
-    type: "object" as const,
-    required: ["name"],
-    properties: {
-      name: {
-        type: "string",
-        description: "Condition name, e.g. 'charmed' or 'Blinded'",
-      },
-    },
-  },
+  inputSchema: lookupConditionInputSchema,
 };
 
 export function handleLookupCondition(args: { name: string }) {
