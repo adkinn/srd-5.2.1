@@ -55,7 +55,7 @@ jobs:
           npx ajv-cli@5 validate -s data/schema/monster.schema.json -d data/monsters.json
           npx ajv-cli@5 validate -s data/schema/condition.schema.json -d data/conditions.json
 
-      # `prepack` copies ../data into mcp/data and rebuilds, so what npm packs
+      # `prepare` copies ../data into mcp/data and rebuilds, so what npm packs
       # is not what sits in the tree right now. Pack first, then assert against
       # the real tarball — this catches an empty or missing dataset, which is
       # the failure that would actually matter to an installer.
@@ -66,6 +66,7 @@ jobs:
           for f in package/dist/index.js \
                    package/dist/server.js \
                    package/dist/data.js \
+                   package/dist/data-node.js \
                    package/dist/tools/lookup_monster.js \
                    package/dist/tools/lookup_condition.js \
                    package/dist/tools/search_monsters.js \

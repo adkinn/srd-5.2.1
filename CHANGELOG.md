@@ -1,5 +1,28 @@
 # Changelog
 
+## v1.4.0 — 2026-08-29
+
+Additive. The dataset, the tool names, the arguments, and the response
+envelopes are unchanged, and the stdio bin behaves exactly as it did in 1.3.0.
+
+- **Declare an `exports` map.** The package previously declared no supported
+  import surface at all — `main` pointed at the stdio bin, so the only sanctioned
+  way to consume it was as a spawned subprocess. It now exposes `.` (the bin,
+  unchanged), `./server` (the server factory and the query layer), and the two
+  raw dataset files at `./data/monsters.json` and `./data/conditions.json`.
+- **Make the server runnable without a filesystem.** The query layer no longer
+  reads its own data: `createSrdData(monstersFile, conditionsFile)` builds the
+  dataset from parsed JSON, and `createSrdServer(version, data)` takes it as an
+  argument. `node:fs` now lives only in the stdio bin and its loader, so
+  `./server` imports cleanly in a Cloudflare Worker or any other
+  browser-standard runtime with the JSON inlined at build time.
+- Lint the `exports` map against what actually ships — every declared subpath
+  must resolve to a real file covered by `files`, checked after the build.
+
+`createSrdServer` now requires a dataset as its second argument. It was never
+reachable through a declared entry point before this release, so no supported
+usage changes.
+
 ## v1.3.0 — 2026-08-29
 
 - Validate tool arguments with Zod. Each tool's schema is the single source for

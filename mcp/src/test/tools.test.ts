@@ -8,15 +8,21 @@ import { handleLookupCondition } from "../tools/lookup_condition.js";
 import { handleSearchMonsters } from "../tools/search_monsters.js";
 import { handleLicense } from "../tools/license.js";
 import { createSrdServer } from "../server.js";
+import { loadSrdData } from "../data-node.js";
 
 // The dataset size is asserted from two angles (direct call and over the
 // protocol). Regenerating the data should fail one obvious place, not two
 // tests that appear to be about different things.
 const MONSTER_COUNT = 322;
 
+// The dataset is injected now rather than imported by the tools. Loading it once
+// here is also the test that the shipped JSON still parses into the shape the
+// query layer expects.
+const data = loadSrdData();
+
 async function withProtocolClient<T>(run: (client: Client) => Promise<T>): Promise<T> {
   const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
-  const server = createSrdServer("test");
+  const server = createSrdServer("test", data);
   const client = new Client({ name: "srd-test", version: "1.0.0" });
 
   await server.connect(serverTransport);
@@ -41,7 +47,7 @@ function textContent(result: Awaited<ReturnType<Client["callTool"]>>): string {
 }
 
 test("lookup_monster returns goblin", () => {
-  const result = handleLookupMonster({ name: "goblin" });
+  const result = handleLookupMonster(data, { name: "goblin" });
   assert.ok(result._license, "has _license field");
   assert.ok(result.monster !== null, "goblin found");
   assert.equal(result.monster!.name, "Goblin");
@@ -50,31 +56,31 @@ test("lookup_monster returns goblin", () => {
 });
 
 test("lookup_monster is case-insensitive", () => {
-  const lower = handleLookupMonster({ name: "adult red dragon" });
-  const mixed = handleLookupMonster({ name: "Adult Red Dragon" });
+  const lower = handleLookupMonster(data, { name: "adult red dragon" });
+  const mixed = handleLookupMonster(data, { name: "Adult Red Dragon" });
   assert.deepEqual(lower.monster?.name, mixed.monster?.name);
 });
 
 test("lookup_monster returns null for unknown", () => {
-  const result = handleLookupMonster({ name: "not-a-real-monster-xyz" });
+  const result = handleLookupMonster(data, { name: "not-a-real-monster-xyz" });
   assert.ok(result._license, "has _license field even on miss");
   assert.equal(result.monster, null);
 });
 
 test("lookup_condition returns charmed", () => {
-  const result = handleLookupCondition({ name: "charmed" });
+  const result = handleLookupCondition(data, { name: "charmed" });
   assert.ok(result._license, "has _license field");
   assert.ok(result.condition !== null, "charmed found");
   assert.equal(result.condition!.name, "Charmed");
 });
 
 test("lookup_condition returns null for unknown", () => {
-  const result = handleLookupCondition({ name: "not-a-condition-xyz" });
+  const result = handleLookupCondition(data, { name: "not-a-condition-xyz" });
   assert.equal(result.condition, null);
 });
 
 test("search_monsters filters by cr and type", () => {
-  const result = handleSearchMonsters({ cr: "1/4", type: "humanoid" });
+  const result = handleSearchMonsters(data, { cr: "1/4", type: "humanoid" });
   assert.ok(result._license, "has _license field");
   assert.ok(result.count > 0, "found at least one CR 1/4 humanoid");
   for (const m of result.monsters) {
@@ -85,12 +91,12 @@ test("search_monsters filters by cr and type", () => {
 });
 
 test("search_monsters with no filters returns all monsters", () => {
-  const result = handleSearchMonsters({});
+  const result = handleSearchMonsters(data, {});
   assert.equal(result.count, MONSTER_COUNT);
 });
 
 test("license tool returns attribution", () => {
-  const result = handleLicense();
+  const result = handleLicense(data);
   assert.ok(result._license, "has _license field");
   assert.ok(result.attribution.includes("Wizards of the Coast"), "WotC credited");
   assert.ok(result.attribution.includes("Open5e"), "Open5e credited");

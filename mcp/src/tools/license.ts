@@ -1,4 +1,4 @@
-import { LICENSE } from "../data.js";
+import type { SrdData } from "../data.js";
 import { z } from "zod";
 
 export const licenseTool = {
@@ -22,6 +22,6 @@ Dataset maintained by Adam Kinney (https://adamkinney.com).
 GitHub: https://github.com/adkinn/srd-5.2.1
 `.trim();
 
-export function handleLicense() {
-  return { _license: LICENSE, attribution: FULL_ATTRIBUTION };
+export function handleLicense(data: SrdData) {
+  return { _license: data.license, attribution: FULL_ATTRIBUTION };
 }

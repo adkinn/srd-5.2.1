@@ -1,4 +1,4 @@
-import { findMonster, LICENSE } from "../data.js";
+import type { SrdData } from "../data.js";
 import { z } from "zod";
 
 const lookupMonsterInputSchema = z.object({
@@ -12,10 +12,10 @@ export const lookupMonsterTool = {
   inputSchema: lookupMonsterInputSchema,
 };
 
-export function handleLookupMonster(args: { name: string }) {
-  const monster = findMonster(args.name);
+export function handleLookupMonster(data: SrdData, args: { name: string }) {
+  const monster = data.findMonster(args.name);
   if (!monster) {
-    return { _license: LICENSE, monster: null };
+    return { _license: data.license, monster: null };
   }
-  return { _license: LICENSE, monster };
+  return { _license: data.license, monster };
 }

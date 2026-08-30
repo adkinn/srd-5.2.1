@@ -23,7 +23,7 @@ See [data/LICENSE](data/LICENSE) for the full attribution block.
 | `data/schema/monster.schema.json` | JSON Schema (draft-07) for `monsters.json` |
 | `data/schema/condition.schema.json` | JSON Schema (draft-07) for `conditions.json` |
 | `data/expected-mismatches.md` | Known differences from the Open5e cross-reference |
-| `mcp/` | stdio MCP server — `lookup_monster`, `lookup_condition`, `search_monsters`, `license` |
+| `mcp/` | MCP server — `lookup_monster`, `lookup_condition`, `search_monsters`, `license` |
 
 This is SRD **5.2.1** (2024 rules), not the 2014 SRD. The data is sourced from the Open5e API
 (`document__slug=wotc-srd`) which publishes the same CC-BY 4.0 licensed content in structured form.
@@ -71,6 +71,22 @@ npx @adkinn/fifth-edition-srd-mcp
 | `license` | Returns the full CC-BY 4.0 attribution block |
 
 Every response includes a `_license` field with the CC-BY 4.0 attribution string.
+
+### Embed it instead
+
+The stdio bin is one way to run the server. The `/server` subpath exports the
+factory and the query layer with no filesystem access, so the same server runs
+in a Cloudflare Worker, Deno, or any other browser-standard runtime with the
+dataset inlined at build time:
+
+```js
+import { createSrdData, createSrdServer } from "@adkinn/fifth-edition-srd-mcp/server";
+import monsters from "@adkinn/fifth-edition-srd-mcp/data/monsters.json";
+import conditions from "@adkinn/fifth-edition-srd-mcp/data/conditions.json";
+
+const server = createSrdServer("1.4.0", createSrdData(monsters, conditions));
+await server.connect(yourTransport);
+```
 
 ---
 

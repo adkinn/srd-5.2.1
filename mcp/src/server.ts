@@ -6,10 +6,24 @@ import {
 } from "@modelcontextprotocol/sdk/types.js";
 import { z, type ZodType } from "zod";
 
+import type { SrdData } from "./data.js";
 import { licenseTool, handleLicense } from "./tools/license.js";
 import { lookupConditionTool, handleLookupCondition } from "./tools/lookup_condition.js";
 import { lookupMonsterTool, handleLookupMonster } from "./tools/lookup_monster.js";
 import { searchMonstersTool, handleSearchMonsters } from "./tools/search_monsters.js";
+
+// This module is the package's programmatic entry (`@adkinn/fifth-edition-srd-mcp/server`).
+// It re-exports the dataset layer so an embedder has one subpath to import from;
+// the Node filesystem loader is deliberately not among them, since the reason
+// this entry exists is to run where there is no filesystem.
+export { createSrdData } from "./data.js";
+export type {
+  Condition,
+  ConditionsFile,
+  Monster,
+  MonstersFile,
+  SrdData,
+} from "./data.js";
 
 const tools = [lookupMonsterTool, lookupConditionTool, searchMonstersTool, licenseTool];
 
@@ -52,7 +66,12 @@ function parseArguments<T extends ZodType>(toolName: string, schema: T, args: un
   };
 }
 
-export function createSrdServer(version: string): Server {
+/**
+ * Build a server bound to a dataset. The dataset is a parameter rather than a
+ * module import so the same server runs on Node (dataset read from disk) and in
+ * a Worker (dataset inlined at build time).
+ */
+export function createSrdServer(version: string, data: SrdData): Server {
   const server = new Server(
     { name: "srd-5.2.1", version },
     { capabilities: { tools: {} } }
@@ -69,22 +88,22 @@ export function createSrdServer(version: string): Server {
       case "lookup_monster": {
         const parsed = parseArguments(name, lookupMonsterTool.inputSchema, args);
         if (!parsed.success) return parsed.error;
-        return textResult(handleLookupMonster(parsed.data));
+        return textResult(handleLookupMonster(data, parsed.data));
       }
       case "lookup_condition": {
         const parsed = parseArguments(name, lookupConditionTool.inputSchema, args);
         if (!parsed.success) return parsed.error;
-        return textResult(handleLookupCondition(parsed.data));
+        return textResult(handleLookupCondition(data, parsed.data));
       }
       case "search_monsters": {
         const parsed = parseArguments(name, searchMonstersTool.inputSchema, args ?? {});
         if (!parsed.success) return parsed.error;
-        return textResult(handleSearchMonsters(parsed.data));
+        return textResult(handleSearchMonsters(data, parsed.data));
       }
       case "license": {
         const parsed = parseArguments(name, licenseTool.inputSchema, args ?? {});
         if (!parsed.success) return parsed.error;
-        return textResult(handleLicense());
+        return textResult(handleLicense(data));
       }
       default:
         return textResult(`Unknown tool: ${name}`, true);

@@ -4,6 +4,7 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { join, dirname } from "node:path";
 
+import { loadSrdData } from "./data-node.js";
 import { createSrdServer } from "./server.js";
 
 // Read the version off package.json rather than restating it here — the
@@ -15,5 +16,5 @@ const { version } = JSON.parse(
   )
 ) as { version: string };
 
-const server = createSrdServer(version);
+const server = createSrdServer(version, loadSrdData());
 await server.connect(new StdioServerTransport());

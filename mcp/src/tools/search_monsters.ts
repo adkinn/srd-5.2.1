@@ -1,4 +1,4 @@
-import { searchMonsters, LICENSE } from "../data.js";
+import type { SrdData } from "../data.js";
 import { z } from "zod";
 
 const searchMonstersInputSchema = z.object({
@@ -20,12 +20,11 @@ export const searchMonstersTool = {
   inputSchema: searchMonstersInputSchema,
 };
 
-export function handleSearchMonsters(args: {
-  cr?: string;
-  type?: string;
-  size?: string;
-}) {
-  const results = searchMonsters(args);
+export function handleSearchMonsters(
+  data: SrdData,
+  args: { cr?: string; type?: string; size?: string }
+) {
+  const results = data.searchMonsters(args);
   const summaries = results.map((m) => ({
     id: m.id,
     name: m.name,
@@ -35,5 +34,5 @@ export function handleSearchMonsters(args: {
     hp_max: m.hp_max,
     armor_class: m.armor_class,
   }));
-  return { _license: LICENSE, count: summaries.length, monsters: summaries };
+  return { _license: data.license, count: summaries.length, monsters: summaries };
 }

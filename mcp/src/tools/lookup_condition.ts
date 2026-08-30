@@ -1,4 +1,4 @@
-import { findCondition, LICENSE } from "../data.js";
+import type { SrdData } from "../data.js";
 import { z } from "zod";
 
 const lookupConditionInputSchema = z.object({
@@ -12,10 +12,10 @@ export const lookupConditionTool = {
   inputSchema: lookupConditionInputSchema,
 };
 
-export function handleLookupCondition(args: { name: string }) {
-  const condition = findCondition(args.name);
+export function handleLookupCondition(data: SrdData, args: { name: string }) {
+  const condition = data.findCondition(args.name);
   if (!condition) {
-    return { _license: LICENSE, condition: null };
+    return { _license: data.license, condition: null };
   }
-  return { _license: LICENSE, condition };
+  return { _license: data.license, condition };
 }

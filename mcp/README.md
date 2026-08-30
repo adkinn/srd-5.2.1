@@ -1,6 +1,7 @@
 # @adkinn/fifth-edition-srd-mcp
 
-A stdio MCP server for the SRD 5.2.1 monster and condition dataset.
+An MCP server for the SRD 5.2.1 monster and condition dataset. Run it as a
+stdio subprocess, or import it and attach your own transport.
 
 ## Install
 
@@ -24,6 +25,27 @@ attribution in `_license`.
 The server requires Node 20 or newer. Source, complete documentation, dataset
 schemas, and attribution are available at
 <https://github.com/adkinn/srd-5.2.1>.
+
+## Embedding it
+
+The stdio bin is one way to run the server, not the only one. The `/server`
+subpath exports the server factory and the query layer with no filesystem
+access, so the same code runs in a browser-standard runtime — a Cloudflare
+Worker, Deno, an edge function — where the dataset is inlined at build time
+rather than read from disk:
+
+```js
+import { createSrdData, createSrdServer } from "@adkinn/fifth-edition-srd-mcp/server";
+import monsters from "@adkinn/fifth-edition-srd-mcp/data/monsters.json";
+import conditions from "@adkinn/fifth-edition-srd-mcp/data/conditions.json";
+
+const server = createSrdServer("1.4.0", createSrdData(monsters, conditions));
+await server.connect(yourTransport);
+```
+
+`createSrdData` also returns the queries directly — `findMonster`,
+`findCondition`, `searchMonsters`, plus the `monsters` and `conditions` arrays
+and the `license` string — if you want the dataset without the MCP layer.
 
 ## License
 
